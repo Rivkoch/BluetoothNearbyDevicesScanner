@@ -24,7 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-
     private BluetoothAdapter bluetoothAdapter;
     private IntentFilter intentFilter;
     private TextView tv, tv_devices;
