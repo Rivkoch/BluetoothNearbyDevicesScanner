@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">DiscoverByBluetooth</string>
+    <string name="device_name">DEVICE_NAME</string>
+    <string name="device_preview">Device:</string>
+    <string name="distance">DISTANCE</string>
+    <string name="distance_preview">Distance:</string>
 </resources>

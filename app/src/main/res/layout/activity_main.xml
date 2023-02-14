@@ -7,25 +7,50 @@
     android:layout_height="match_parent"
     android:gravity="top|center"
     android:orientation="vertical"
+    android:background="@color/peach"
     tools:context=".MainActivity">
 
     <Button
         android:id="@+id/btn_bluetoothScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="start scan"/>
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:text="start scan"
+        android:backgroundTint="@color/cherry"/>
+
+   <!-- <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        />-->
 
     <TextView
-        android:id="@+id/tv_broadcast"
+        android:id="@+id/scanning_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="S c a n n i n g"
+        android:layout_gravity="bottom|center"
+        android:textStyle="italic"
+        android:textSize="24sp"
+        android:textColor="@color/cherry"/>
 
-    <TextView
-        android:id="@+id/tv_devices"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Devices:" />
+    <!--
+    47CF21-->
+     <com.airbnb.lottie.LottieAnimationView
+         android:id="@+id/scanningLottie"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         app:lottie_autoPlay="true"
+         android:elevation="5dp"
+         app:lottie_rawRes="@raw/loading_dots"
+         />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/activityMain_RV_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"/>
 
 
 </LinearLayout>
