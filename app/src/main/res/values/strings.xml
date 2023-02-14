@@ -4,4 +4,6 @@
     <string name="device_preview">Device:</string>
     <string name="distance">DISTANCE</string>
     <string name="distance_preview">Distance:</string>
+    <string name="turnOn_btn">on</string>
+    <string name="turnOff_btn">off</string>
 </resources>

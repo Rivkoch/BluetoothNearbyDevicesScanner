@@ -10,20 +10,62 @@
     android:background="@color/peach"
     tools:context=".MainActivity">
 
+    <LinearLayout
+        android:id="@+id/ble_settings_LL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+        <LinearLayout
+            android:id="@+id/ble_onOff_LL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <Button
+            android:id="@+id/turnOn_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#F2DDC6"
+            android:textColor="@color/cherry"
+            android:text="@string/turnOn_btn"
+            android:textSize="14dp"/>
+
+        <ImageView
+            android:id="@+id/ble_img"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/va_bluetooth_disabled"/>
+        <Button
+            android:id="@+id/turnOff_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#F2DDC6"
+            android:textColor="@color/cherry"
+            android:text="@string/turnOff_btn"
+            android:textSize="14dp"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/imgbtn_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:src="@drawable/va_settings"
+            android:backgroundTint="@color/peach"/>
+
+
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/btn_bluetoothScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="10dp"
+        android:textSize="18dp"
         android:text="start scan"
         android:backgroundTint="@color/cherry"/>
-
-   <!-- <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        />-->
 
     <TextView
         android:id="@+id/scanning_tv"

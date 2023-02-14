@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -33,7 +34,11 @@ import android.provider.Settings;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 
@@ -47,7 +52,10 @@ public class MainActivity extends AppCompatActivity {
     private Device device;
     private BluetoothAdapter bluetoothAdapter;
     private IntentFilter intentFilter;
-    private Button btn_bluetoothScan;
+    private ImageView ble_img;
+    private ImageButton imgbtn_settings;
+    private Button btn_bluetoothScan, turnOff_btn, turnOn_btn;
+    private LinearLayout ble_settings_LL, ble_onOff_LL;
     private LottieAnimationView scanningLottie;
     private TextView scanning_tv;
     private Boolean isLocationPermission;
@@ -55,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MANUALLY_LOCATION_PERMISSION_REQUEST_CODE = 124;
     private List<Device> bluetoothDevices;
     private List<String> listOfNames;
+    private boolean isRegistred;
 
     //common callback for location and nearby
     ActivityResultCallback<Boolean> permissionCallBack = new ActivityResultCallback<Boolean>() {
@@ -74,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
     ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), permissionCallBack);
+
 
 
     @Override
@@ -103,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     private void setData() {
         bluetoothDevices = new ArrayList<>();
         device = new Device();
-        listOfNames= new ArrayList<>();
+        listOfNames = new ArrayList<>();
     }
 
     private void setBluetoothAdapter() {
@@ -113,9 +123,57 @@ public class MainActivity extends AppCompatActivity {
 
     private void setListeners() {
 
+        turnOn_btn.setOnClickListener(v -> {
+            if (bluetoothAdapter.isEnabled()) {
+                Toast.makeText(this, "Already on", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "TURN on", Toast.LENGTH_SHORT).show();
+
+//                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//                request = ENABLE;
+//                someActivityResultLauncher.launch(intent);
+//                requestEnableBluetooth();
+            }
+        });
+
+        turnOff_btn.setOnClickListener(v -> {
+            if (!bluetoothAdapter.isEnabled()) {
+                Toast.makeText(this, "Already off", Toast.LENGTH_SHORT).show();
+            } else {
+
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                            return;
+                        }
+                    }
+                }
+                bluetoothAdapter.disable();
+                    ble_img.setImageResource(R.drawable.va_bluetooth_disabled);
+                    Toast.makeText(this, "Bluetooth turned off", Toast.LENGTH_SHORT).show();
+
+                    return;
+
+
+
+            }
+        });
+
+        imgbtn_settings.setOnClickListener(v->{
+            if(ble_onOff_LL.getVisibility() == View.GONE){
+                ble_onOff_LL.setVisibility(View.VISIBLE);
+            }else if(ble_onOff_LL.getVisibility() == View.VISIBLE){
+                ble_onOff_LL.setVisibility(View.GONE);
+            }
+        });
+
         btn_bluetoothScan.setOnClickListener(v -> {
 
-            // tv_devices.setText("");
+            if (!bluetoothAdapter.isEnabled()) {
+                Toast.makeText(this, "Bluetooth off, turn in on for scanning.", Toast.LENGTH_SHORT).show();
+            }
+
             checkPermissions();
 
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
@@ -226,6 +284,13 @@ public class MainActivity extends AppCompatActivity {
             recyclerView= findViewById(R.id.activityMain_RV_recyclerView);
 //        tv_devices = findViewById(R.id.tv_devices);
         btn_bluetoothScan = findViewById(R.id.btn_bluetoothScan);
+        ble_img = findViewById(R.id.ble_img);
+        ble_settings_LL = findViewById(R.id.ble_settings_LL);
+        ble_onOff_LL = findViewById(R.id.ble_onOff_LL);
+        ble_onOff_LL.setVisibility(View.GONE);
+        imgbtn_settings = findViewById(R.id.imgbtn_settings);
+        turnOn_btn = findViewById(R.id.turnOn_btn);
+        turnOff_btn = findViewById(R.id.turnOff_btn);
         scanning_tv = findViewById(R.id.scanning_tv);
         scanning_tv.setVisibility(View.GONE);
         scanningLottie = findViewById(R.id.scanningLottie);
@@ -254,6 +319,7 @@ public class MainActivity extends AppCompatActivity {
                 // Disable button and show animation
                 btn_bluetoothScan.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.GONE);
+                ble_settings_LL.setVisibility(View.GONE);
                 scanning_tv.setVisibility(View.VISIBLE);
 //                scanning_tv.animate().translationX(-2000).setDuration(10000).setStartDelay(2900);
                 scanningLottie.setVisibility(View.VISIBLE);
@@ -268,8 +334,10 @@ public class MainActivity extends AppCompatActivity {
                 // Enable button and finish animation
                 btn_bluetoothScan.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.VISIBLE);
+                ble_settings_LL.setVisibility(View.VISIBLE);
                 scanningLottie.setVisibility(View.GONE);
                 scanning_tv.setVisibility(View.GONE);
+
 
                 //discovery finishes, dismiss progress dialog
             } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
@@ -307,6 +375,7 @@ public class MainActivity extends AppCompatActivity {
                 setBluetoothAdapter();
                 createIntentFilter();
                 registerReceiver(bluetoothScanReceiver, intentFilter);
+                isRegistred = true;
 
             }
 
@@ -320,7 +389,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (bluetoothScanReceiver != null)
-            unregisterReceiver(bluetoothScanReceiver);
+            if(isRegistred) {
+                unregisterReceiver(bluetoothScanReceiver);
+            }
     }
 
     @Override
