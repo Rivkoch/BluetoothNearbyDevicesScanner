@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
     ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), permissionCallBack);
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,20 +147,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 bluetoothAdapter.disable();
-                    ble_img.setImageResource(R.drawable.va_bluetooth_disabled);
-                    Toast.makeText(this, "Bluetooth turned off", Toast.LENGTH_SHORT).show();
-
-                    return;
-
-
+                ble_img.setImageResource(R.drawable.va_bluetooth_disabled);
+                Toast.makeText(this, "Bluetooth turned off", Toast.LENGTH_SHORT).show();
 
             }
         });
 
-        imgbtn_settings.setOnClickListener(v->{
-            if(ble_onOff_LL.getVisibility() == View.GONE){
+        imgbtn_settings.setOnClickListener(v -> {
+            if (ble_onOff_LL.getVisibility() == View.GONE) {
                 ble_onOff_LL.setVisibility(View.VISIBLE);
-            }else if(ble_onOff_LL.getVisibility() == View.VISIBLE){
+            } else if (ble_onOff_LL.getVisibility() == View.VISIBLE) {
                 ble_onOff_LL.setVisibility(View.GONE);
             }
         });
@@ -183,10 +178,20 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-//            registerReceiver(bluetoothScanReceiver, intentFilter);
+            if(!isRegistred) {
+                registerReceiver(bluetoothScanReceiver, intentFilter);
+                isRegistred = true;
+            }
             if (!bluetoothAdapter.isDiscovering()) {
                 bluetoothAdapter.startDiscovery();
             }
+
+            if(bluetoothDevices.isEmpty()){
+                scanning_tv.setTextSize(14);
+                scanning_tv.setVisibility(View.VISIBLE);
+                scanning_tv.setText("No devices were found.");
+            }
+
         });
     }
 
@@ -197,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         // There are no request codes
-                        Intent data = result.getData();
                         ble_img.setImageResource(R.drawable.va_bluetooth_enabled);
                         Toast.makeText(MainActivity.this, "Bluetooth turned on", Toast.LENGTH_LONG).show();
 
@@ -297,8 +301,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void findViews() {
-        if(recyclerView==null)
-            recyclerView= findViewById(R.id.activityMain_RV_recyclerView);
+        if (recyclerView == null)
+            recyclerView = findViewById(R.id.activityMain_RV_recyclerView);
 //        tv_devices = findViewById(R.id.tv_devices);
         btn_bluetoothScan = findViewById(R.id.btn_bluetoothScan);
         ble_img = findViewById(R.id.ble_img);
@@ -328,7 +332,6 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("MissingPermission")
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            boolean isLoading;
 
             if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
                 // Discovery starts
@@ -364,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
                 String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
                 if (name != null) {
 
-                    if(listOfNames.size() == 0 || !  listOfNames.contains(name)){
+                    if (listOfNames.size() == 0 || !listOfNames.contains(name)) {
                         device.setName(name);
                         device.setDistance(calculateDistance(rssi));
                         // Add device to list
@@ -388,11 +391,13 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         try {
-            if(bluetoothAdapter==null) {
+            if (bluetoothAdapter == null) {
                 setBluetoothAdapter();
                 createIntentFilter();
-                registerReceiver(bluetoothScanReceiver, intentFilter);
-                isRegistred = true;
+                if(!isRegistred) {
+                    registerReceiver(bluetoothScanReceiver, intentFilter);
+                    isRegistred = true;
+                }
 
             }
 
@@ -406,8 +411,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (bluetoothScanReceiver != null)
-            if(isRegistred) {
+            if (isRegistred) {
                 unregisterReceiver(bluetoothScanReceiver);
+                isRegistred = false;
             }
     }
 
