@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
         btn_bluetoothScan.setOnClickListener(v -> {
 
             if (!bluetoothAdapter.isEnabled()) {
-                Toast.makeText(this, "Bluetooth off, turn in on for scanning.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Bluetooth off, turn it on for scanning.", Toast.LENGTH_LONG).show();
             }
 
             checkPermissions();
