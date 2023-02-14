@@ -5,6 +5,7 @@ import static android.bluetooth.BluetoothAdapter.ACTION_DISCOVERY_STARTED;
 import static android.bluetooth.BluetoothAdapter.ACTION_SCAN_MODE_CHANGED;
 import static android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -127,12 +128,9 @@ public class MainActivity extends AppCompatActivity {
             if (bluetoothAdapter.isEnabled()) {
                 Toast.makeText(this, "Already on", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "TURN on", Toast.LENGTH_SHORT).show();
 
-//                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//                request = ENABLE;
-//                someActivityResultLauncher.launch(intent);
-//                requestEnableBluetooth();
+                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                someActivityResultLauncher.launch(intent);
             }
         });
 
@@ -191,6 +189,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // There are no request codes
+                        Intent data = result.getData();
+                        ble_img.setImageResource(R.drawable.va_bluetooth_enabled);
+                        Toast.makeText(MainActivity.this, "Bluetooth turned on", Toast.LENGTH_LONG).show();
+
+                    } else {
+                        Toast.makeText(MainActivity.this, "The user decided to deny bluetooth access", Toast.LENGTH_LONG).show();
+                    }
+
+                }
+            });
+
 
     private void checkPermissions() {
 
