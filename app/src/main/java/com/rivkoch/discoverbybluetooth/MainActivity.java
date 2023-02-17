@@ -9,7 +9,6 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,15 +33,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.airbnb.lottie.LottieAnimationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,12 +50,11 @@ public class MainActivity extends AppCompatActivity {
     private Device device;
     private BluetoothAdapter bluetoothAdapter;
     private IntentFilter intentFilter;
-    private ImageView ble_img;
-    private ImageButton imgbtn_settings;
-    private Button btn_bluetoothScan, turnOff_btn, turnOn_btn;
-    private LinearLayout ble_settings_LL, ble_onOff_LL;
-    private LottieAnimationView scanningLottie;
-    private TextView scanning_tv, dots_tv;
+    private ImageView main_img_bluetoothStatus;
+    private ImageButton main_imgbtn_settings;
+    private Button main_btn_bluetoothScan, main_btn_turnOff, main_btn_turnOn;
+    private LinearLayout main_LL_settingsLayout, main_LL_onOffLayout;
+    private TextView main_tv_scanning, main_tv_dots;
     private Boolean isLocationPermission;
 
     private static final int MANUALLY_LOCATION_PERMISSION_REQUEST_CODE = 124;
@@ -86,17 +81,16 @@ public class MainActivity extends AppCompatActivity {
     };
     ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), permissionCallBack);
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setData();
         findViews();
+        setViewVisibility();
+        setData();
         setRecyclerView();
         setViewAdapter();
-
         setListeners();
     }
 
@@ -115,6 +109,14 @@ public class MainActivity extends AppCompatActivity {
         bluetoothDevices = new ArrayList<>();
         device = new Device();
         listOfNames = new ArrayList<>();
+        if (bluetoothAdapter == null) {
+            setBluetoothAdapter();
+        }
+        if (bluetoothAdapter.isEnabled()) {
+            main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_enabled);
+        } else {
+            main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_disabled);
+        }
     }
 
     private void setBluetoothAdapter() {
@@ -123,8 +125,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
-
-        turnOn_btn.setOnClickListener(v -> {
+        main_btn_turnOn.setOnClickListener(v -> {
             if (bluetoothAdapter.isEnabled()) {
                 Toast.makeText(this, "Already on", Toast.LENGTH_SHORT).show();
             } else {
@@ -134,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        turnOff_btn.setOnClickListener(v -> {
+        main_btn_turnOff.setOnClickListener(v -> {
             if (!bluetoothAdapter.isEnabled()) {
                 Toast.makeText(this, "Already off", Toast.LENGTH_SHORT).show();
             } else {
@@ -148,21 +149,21 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 bluetoothAdapter.disable();
-                ble_img.setImageResource(R.drawable.va_bluetooth_disabled);
+                main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_disabled);
                 Toast.makeText(this, "Bluetooth turned off", Toast.LENGTH_SHORT).show();
 
             }
         });
 
-        imgbtn_settings.setOnClickListener(v -> {
-            if (ble_onOff_LL.getVisibility() == View.GONE) {
-                ble_onOff_LL.setVisibility(View.VISIBLE);
-            } else if (ble_onOff_LL.getVisibility() == View.VISIBLE) {
-                ble_onOff_LL.setVisibility(View.GONE);
+        main_imgbtn_settings.setOnClickListener(v -> {
+            if (main_LL_onOffLayout.getVisibility() == View.GONE) {
+                main_LL_onOffLayout.setVisibility(View.VISIBLE);
+            } else if (main_LL_onOffLayout.getVisibility() == View.VISIBLE) {
+                main_LL_onOffLayout.setVisibility(View.GONE);
             }
         });
 
-        btn_bluetoothScan.setOnClickListener(v -> {
+        main_btn_bluetoothScan.setOnClickListener(v -> {
 
             if (!bluetoothAdapter.isEnabled()) {
                 Toast.makeText(this, "Bluetooth off, turn it on for scanning.", Toast.LENGTH_LONG).show();
@@ -186,13 +187,13 @@ public class MainActivity extends AppCompatActivity {
 
             if (!bluetoothAdapter.isDiscovering()) {
                 bluetoothAdapter.startDiscovery();
-                afterDiscover = true;
+                afterDiscover = false;
             }
 
             if(bluetoothDevices.isEmpty() && afterDiscover){
-                scanning_tv.setTextSize(14);
-                scanning_tv.setVisibility(View.VISIBLE);
-                scanning_tv.setText("No devices were found.");
+                main_tv_scanning.setTextSize(14);
+                main_tv_scanning.setVisibility(View.VISIBLE);
+                main_tv_scanning.setText("No devices were found.");
             }
 
         });
@@ -205,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         // There are no request codes
-                        ble_img.setImageResource(R.drawable.va_bluetooth_enabled);
+                        main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_enabled);
                         Toast.makeText(MainActivity.this, "Bluetooth turned on", Toast.LENGTH_LONG).show();
 
                     } else {
@@ -217,7 +218,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void checkPermissions() {
-
         boolean resultNearby = false;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             resultNearby = ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED;
@@ -255,8 +255,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openPermissionSettingDialog() {
+        String message="";
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            message = "Location and Nearby permissions are important for app functionality. You will be transported to Setting screen because the permissions are permanently disable. Please manually allow them.";
+        }else {
+            message = "DiscoverByBluetooth permission are important for app functionality. You will be transported to Setting screen because access to the device's location is permanently disable. Please manually allow it.";
 
-        String message = "Location and Nearby permissions are important for app functionality. You will be transported to Setting screen because the permissions are permanently disable. Please manually allow them.";
+        }
         alertDialog =
                 new AlertDialog.Builder(MainActivity.this)
                         .setMessage(message)
@@ -299,24 +304,22 @@ public class MainActivity extends AppCompatActivity {
         intent.setData(uri);
         manuallyPermissionResultLauncher.launch(intent);
     }
-
+    private void setViewVisibility() {
+        main_LL_onOffLayout.setVisibility(View.GONE);
+        main_tv_scanning.setVisibility(View.GONE);
+    }
     private void findViews() {
         if (recyclerView == null)
             recyclerView = findViewById(R.id.activityMain_RV_recyclerView);
-//        tv_devices = findViewById(R.id.tv_devices);
-        btn_bluetoothScan = findViewById(R.id.btn_bluetoothScan);
-        ble_img = findViewById(R.id.ble_img);
-        ble_settings_LL = findViewById(R.id.ble_settings_LL);
-        ble_onOff_LL = findViewById(R.id.ble_onOff_LL);
-        ble_onOff_LL.setVisibility(View.GONE);
-        imgbtn_settings = findViewById(R.id.imgbtn_settings);
-        turnOn_btn = findViewById(R.id.turnOn_btn);
-        turnOff_btn = findViewById(R.id.turnOff_btn);
-        scanning_tv = findViewById(R.id.scanning_tv);
-        dots_tv = findViewById(R.id.dots_tv);
-        scanning_tv.setVisibility(View.GONE);
-        scanningLottie = findViewById(R.id.scanningLottie);
-        scanningLottie.setVisibility(View.GONE);
+        main_btn_bluetoothScan = findViewById(R.id.main_btn_bluetoothScan);
+        main_img_bluetoothStatus = findViewById(R.id.main_img_bluetoothStatus);
+        main_LL_settingsLayout = findViewById(R.id.main_LL_settingsLayout);
+        main_LL_onOffLayout = findViewById(R.id.main_LL_onOffLayout);
+        main_imgbtn_settings = findViewById(R.id.main_imgbtn_settings);
+        main_btn_turnOn = findViewById(R.id.main_btn_turnOn);
+        main_btn_turnOff = findViewById(R.id.main_btn_turnOff);
+        main_tv_scanning = findViewById(R.id.main_tv_scanning);
+        main_tv_dots = findViewById(R.id.main_tv_dots);
     }
 
     private void createIntentFilter() {
@@ -328,52 +331,53 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(ACTION_SCAN_MODE_CHANGED);
     }
 
-
     private final BroadcastReceiver bluetoothScanReceiver = new BroadcastReceiver() {
         @SuppressLint("MissingPermission")
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            afterDiscover = true;
+            main_tv_dots.append(" . ");
 
+            /* Discovery starts */
             if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                // Discovery starts
 
-                // Disable button and view while showing animation only
-                btn_bluetoothScan.setVisibility(View.GONE);
-                ble_settings_LL.setVisibility(View.GONE);
-                scanning_tv.setVisibility(View.VISIBLE);
-                scanning_tv.setTextSize(24);
-                scanning_tv.setText("S c a n n i n g\n");
+                // Disable button and view while showing "animation" only
+                main_btn_bluetoothScan.setVisibility(View.GONE);
+                main_LL_settingsLayout.setVisibility(View.GONE);
+                main_tv_scanning.setVisibility(View.VISIBLE);
+                main_tv_scanning.setTextSize(24);
+                main_tv_scanning.setText("S c a n n i n g\n");
+                main_tv_dots.setVisibility(View.VISIBLE);
 
-                // Clear the recycler view
+                // Clear recycler view data
                 bluetoothDevices.clear();
                 listOfNames.clear();
                 deviceAdapter.clearList();
 
+                /* Discovery finishes */
             } else if (ACTION_DISCOVERY_FINISHED.equals(action)) {
-                // Enable button and finish animation
-                ble_settings_LL.setVisibility(View.VISIBLE);
-                scanning_tv.setVisibility(View.GONE);
-                btn_bluetoothScan.setVisibility(View.VISIBLE);
-                dots_tv.setText("");
-                dots_tv.setVisibility(View.GONE);
+                // Enable view and finish animation
+                main_LL_settingsLayout.setVisibility(View.VISIBLE);
+                main_tv_scanning.setVisibility(View.GONE);
+                main_btn_bluetoothScan.setVisibility(View.VISIBLE);
+                main_tv_dots.setText("");
+                main_tv_dots.setVisibility(View.GONE);
 
 
-                //discovery finishes, dismiss progress dialog
+                /* Bluetooth device found */
             } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 
-                //bluetooth device found
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                 String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
-                dots_tv.append(" . ");
+                int txPower = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
 
                 if (name != null) {
 
-//                    scanning_tv.setTextColor(getColor(R.color.grey));
-//                    scanning_tv.setText("S c a n n i n g");
-
                     if (listOfNames.size() == 0 || !listOfNames.contains(name)) {
+
                         device.setName(name);
-                        device.setDistance(calculateDistance(rssi));
+                        device.setDistance(calculateDistance(rssi, txPower));
+
                         // Add device to list
                         bluetoothDevices.add(device);
                         listOfNames.add(name);
@@ -382,15 +386,19 @@ public class MainActivity extends AppCompatActivity {
                         deviceAdapter.addToList(device);
                     }
                     else{
-                        dots_tv.append(" . ");
+                        // The "scanning animation"
+                        main_tv_dots.append(" . ");
                     }
                 }
             }
         }
     };
 
-    private double calculateDistance(int rssi) {
-        int txPower = -59; // Hardcoded tx power value, can be obtained from the scanRecord
+//    private double calculateDistance(int rssi) {
+//        int txPower = -59; // Hardcoded tx power value, can be obtained from the scanRecord
+//        return Math.pow(10d, ((double) txPower - rssi) / (10 * 2));
+//    }
+    private double calculateDistance(int rssi, int txPower) {
         return Math.pow(10d, ((double) txPower - rssi) / (10 * 2));
     }
 
