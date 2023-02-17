@@ -71,10 +71,18 @@
         android:id="@+id/scanning_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="S c a n n i n g"
-        android:layout_gravity="bottom|center"
+        android:layout_marginTop="15dp"
         android:textStyle="italic"
-        android:textSize="24sp"
+        android:layout_gravity="bottom|center"
+        android:textColor="@color/cherry"/>
+
+    <TextView
+        android:id="@+id/dots_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:textStyle="italic"
+        android:layout_gravity="bottom|center"
         android:textColor="@color/cherry"/>
 
     <!--

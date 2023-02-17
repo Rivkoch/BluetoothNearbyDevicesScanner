@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -58,13 +59,13 @@ public class MainActivity extends AppCompatActivity {
     private Button btn_bluetoothScan, turnOff_btn, turnOn_btn;
     private LinearLayout ble_settings_LL, ble_onOff_LL;
     private LottieAnimationView scanningLottie;
-    private TextView scanning_tv;
+    private TextView scanning_tv, dots_tv;
     private Boolean isLocationPermission;
 
     private static final int MANUALLY_LOCATION_PERMISSION_REQUEST_CODE = 124;
     private List<Device> bluetoothDevices;
     private List<String> listOfNames;
-    private boolean isRegistred;
+    private boolean isRegistred, afterDiscover;
 
     //common callback for location and nearby
     ActivityResultCallback<Boolean> permissionCallBack = new ActivityResultCallback<Boolean>() {
@@ -182,11 +183,13 @@ public class MainActivity extends AppCompatActivity {
                 registerReceiver(bluetoothScanReceiver, intentFilter);
                 isRegistred = true;
             }
+
             if (!bluetoothAdapter.isDiscovering()) {
                 bluetoothAdapter.startDiscovery();
+                afterDiscover = true;
             }
 
-            if(bluetoothDevices.isEmpty()){
+            if(bluetoothDevices.isEmpty() && afterDiscover){
                 scanning_tv.setTextSize(14);
                 scanning_tv.setVisibility(View.VISIBLE);
                 scanning_tv.setText("No devices were found.");
@@ -232,9 +235,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestNearby() {
         isLocationPermission = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            requestPermissionLauncher.launch(android.Manifest.permission.BLUETOOTH_CONNECT);
-        }
+        requestPermissionLauncher.launch(android.Manifest.permission.BLUETOOTH_CONNECT);
+
     }
 
     private void requestPermissionWithRationaleCheck() {
@@ -243,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
 
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             openPermissionSettingDialog();
-//            requestNearby();
         }
 
     }
@@ -281,10 +282,9 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == MANUALLY_LOCATION_PERMISSION_REQUEST_CODE) {
             boolean result = false;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                result = ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
-            }
-            if (result) {
+            result = ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
+
+            if (result && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 requestNearby();
 
             }
@@ -313,6 +313,7 @@ public class MainActivity extends AppCompatActivity {
         turnOn_btn = findViewById(R.id.turnOn_btn);
         turnOff_btn = findViewById(R.id.turnOff_btn);
         scanning_tv = findViewById(R.id.scanning_tv);
+        dots_tv = findViewById(R.id.dots_tv);
         scanning_tv.setVisibility(View.GONE);
         scanningLottie = findViewById(R.id.scanningLottie);
         scanningLottie.setVisibility(View.GONE);
@@ -336,14 +337,12 @@ public class MainActivity extends AppCompatActivity {
             if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
                 // Discovery starts
 
-                // Disable button and show animation
+                // Disable button and view while showing animation only
                 btn_bluetoothScan.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.GONE);
                 ble_settings_LL.setVisibility(View.GONE);
                 scanning_tv.setVisibility(View.VISIBLE);
-//                scanning_tv.animate().translationX(-2000).setDuration(10000).setStartDelay(2900);
-                scanningLottie.setVisibility(View.VISIBLE);
-                scanningLottie.setRepeatCount(Animation.INFINITE);
+                scanning_tv.setTextSize(24);
+                scanning_tv.setText("S c a n n i n g\n");
 
                 // Clear the recycler view
                 bluetoothDevices.clear();
@@ -352,11 +351,11 @@ public class MainActivity extends AppCompatActivity {
 
             } else if (ACTION_DISCOVERY_FINISHED.equals(action)) {
                 // Enable button and finish animation
-                btn_bluetoothScan.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.VISIBLE);
                 ble_settings_LL.setVisibility(View.VISIBLE);
-                scanningLottie.setVisibility(View.GONE);
                 scanning_tv.setVisibility(View.GONE);
+                btn_bluetoothScan.setVisibility(View.VISIBLE);
+                dots_tv.setText("");
+                dots_tv.setVisibility(View.GONE);
 
 
                 //discovery finishes, dismiss progress dialog
@@ -365,7 +364,12 @@ public class MainActivity extends AppCompatActivity {
                 //bluetooth device found
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                 String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
+                dots_tv.append(" . ");
+
                 if (name != null) {
+
+//                    scanning_tv.setTextColor(getColor(R.color.grey));
+//                    scanning_tv.setText("S c a n n i n g");
 
                     if (listOfNames.size() == 0 || !listOfNames.contains(name)) {
                         device.setName(name);
@@ -376,6 +380,9 @@ public class MainActivity extends AppCompatActivity {
 
                         // Put the device into recycler view that will show the devices
                         deviceAdapter.addToList(device);
+                    }
+                    else{
+                        dots_tv.append(" . ");
                     }
                 }
             }
@@ -403,7 +410,6 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             // already registered
-            //   tv.setText("Receiver is already received");
         }
     }
 
