@@ -10,6 +10,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private List<String> listOfNames;
     private boolean isRegistred, afterDiscover;
 
-    //common callback for location and nearby
+    /* common callback for location and nearby */
     ActivityResultCallback<Boolean> permissionCallBack = new ActivityResultCallback<Boolean>() {
         @Override
         public void onActivityResult(Boolean isGranted) {
@@ -125,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
     private void setListeners() {
 
         main_switch_onOffBluetooth.setOnClickListener(v -> {
-            if (main_switch_onOffBluetooth.isChecked()) {
 
+            if (main_switch_onOffBluetooth.isChecked()) {
                 if (bluetoothAdapter.isEnabled()) {
                     Toast.makeText(this, "Already on", Toast.LENGTH_SHORT).show();
                 } else {
@@ -240,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     private void requestNearby() {
         isLocationPermission = false;
         requestPermissionLauncher.launch(android.Manifest.permission.BLUETOOTH_CONNECT);
@@ -259,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openPermissionSettingDialog() {
-        String message="";
+        String message;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             message = "Location and Nearby permissions are important for app functionality. You will be transported to Setting screen because the permissions are permanently disable. Please manually allow them.";
         }else {
@@ -288,8 +290,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == MANUALLY_LOCATION_PERMISSION_REQUEST_CODE) {
-            boolean result = false;
-            result = ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
+            boolean result = ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
             if (result && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 requestNearby();
             }
@@ -347,6 +348,8 @@ public class MainActivity extends AppCompatActivity {
                 main_tv_scanning.setTextSize(24);
                 main_tv_scanning.setText("S c a n n i n g\n");
                 main_tv_dots.setVisibility(View.VISIBLE);
+                main_LL_onOffLayout.setVisibility(View.GONE);
+
 
                 // Clear recycler view data
                 bluetoothDevices.clear();
