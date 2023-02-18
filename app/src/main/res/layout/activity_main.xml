@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="end">
+
         <LinearLayout
             android:id="@+id/main_LL_onOffLayout"
             android:layout_width="wrap_content"
@@ -54,6 +55,21 @@
             android:backgroundTint="@color/peach"/>
 
 
+      <!--
+
+<ImageView
+            android:id="@+id/main_img_bluetoothStatus"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/va_bluetooth_disabled"/>
+
+      <Switch
+            android:id="@+id/main_switch_onOffBluetooth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Bluetooth" />
+-->
 
     </LinearLayout>
 

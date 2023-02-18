@@ -116,6 +116,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
+
+        /*
+        IF WORK WITH SWITCH
+
+        main_switch_onOffBluetooth.setOnClickListener(v -> {
+            if (main_switch_onOffBluetooth.isChecked()) {
+
+                if (bluetoothAdapter.isEnabled()) {
+                    Toast.makeText(this, "Already on", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    someActivityResultLauncher.launch(intent);
+                }
+            }
+
+//        main_btn_turnOff.setOnClickListener(v -> {
+            else {
+                if (!bluetoothAdapter.isEnabled()) {
+                    Toast.makeText(this, "Already off", Toast.LENGTH_SHORT).show();
+                } else {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        if (ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                                return;
+                            }
+                        }
+                    }
+                    bluetoothAdapter.disable();
+                    main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_disabled);
+                    Toast.makeText(this, "Bluetooth turned off", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });*/
+
+
         main_btn_turnOn.setOnClickListener(v -> {
             if (bluetoothAdapter.isEnabled()) {
                 Toast.makeText(this, "Already on", Toast.LENGTH_SHORT).show();
