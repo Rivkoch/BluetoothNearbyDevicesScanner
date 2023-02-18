@@ -28,6 +28,8 @@ public class SplashScreen extends AppCompatActivity {
             public void run() {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
+                finish();
+
             }
         }, 5000);
     }
@@ -36,4 +38,10 @@ public class SplashScreen extends AppCompatActivity {
         appname = findViewById(R.id.appname);
         lottie = findViewById(R.id.lottie);
     }
+
+    @Override
+    public void onBackPressed() {
+        // Do nothing
+    }
+
 }
