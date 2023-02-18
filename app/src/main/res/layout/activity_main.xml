@@ -22,28 +22,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-        <Button
-            android:id="@+id/main_btn_turnOn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#F2DDC6"
-            android:textColor="@color/cherry"
-            android:text="@string/turnOn_btn"
-            android:textSize="14dp"/>
 
-        <ImageView
-            android:id="@+id/main_img_bluetoothStatus"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:src="@drawable/va_bluetooth_disabled"/>
-        <Button
-            android:id="@+id/main_btn_turnOff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#F2DDC6"
-            android:textColor="@color/cherry"
-            android:text="@string/turnOff_btn"
-            android:textSize="14dp"/>
+            <ImageView
+                android:id="@+id/main_img_bluetoothStatus"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/va_bluetooth_disabled"/>
+            <Switch
+                android:id="@+id/main_switch_onOffBluetooth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="Bluetooth"
+                />
+
         </LinearLayout>
 
         <ImageButton
@@ -53,23 +45,6 @@
             android:layout_gravity="end"
             android:src="@drawable/va_settings"
             android:backgroundTint="@color/peach"/>
-
-
-      <!--
-
-<ImageView
-            android:id="@+id/main_img_bluetoothStatus"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:src="@drawable/va_bluetooth_disabled"/>
-
-      <Switch
-            android:id="@+id/main_switch_onOffBluetooth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="Bluetooth" />
--->
 
     </LinearLayout>
 

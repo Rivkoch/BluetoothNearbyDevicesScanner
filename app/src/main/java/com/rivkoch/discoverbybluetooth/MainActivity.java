@@ -37,6 +37,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
     private IntentFilter intentFilter;
     private ImageView main_img_bluetoothStatus;
     private ImageButton main_imgbtn_settings;
-    private Button main_btn_bluetoothScan, main_btn_turnOff, main_btn_turnOn;
+    private Button main_btn_bluetoothScan;
+    private Switch main_switch_onOffBluetooth;
     private LinearLayout main_LL_settingsLayout, main_LL_onOffLayout;
     private TextView main_tv_scanning, main_tv_dots;
     private Boolean isLocationPermission;
@@ -88,6 +90,11 @@ public class MainActivity extends AppCompatActivity {
 
         setData();
         findViews();
+        if (bluetoothAdapter == null) {
+            setBluetoothAdapter();
+            getBleData();
+        }
+        createIntentFilter();
         setRecyclerView();
         setViewAdapter();
         setListeners();
@@ -117,9 +124,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setListeners() {
 
-        /*
-        IF WORK WITH SWITCH
-
         main_switch_onOffBluetooth.setOnClickListener(v -> {
             if (main_switch_onOffBluetooth.isChecked()) {
 
@@ -131,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-//        main_btn_turnOff.setOnClickListener(v -> {
             else {
                 if (!bluetoothAdapter.isEnabled()) {
                     Toast.makeText(this, "Already off", Toast.LENGTH_SHORT).show();
@@ -148,34 +151,6 @@ public class MainActivity extends AppCompatActivity {
                     main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_disabled);
                     Toast.makeText(this, "Bluetooth turned off", Toast.LENGTH_SHORT).show();
                 }
-            }
-        });*/
-
-
-        main_btn_turnOn.setOnClickListener(v -> {
-            if (bluetoothAdapter.isEnabled()) {
-                Toast.makeText(this, "Already on", Toast.LENGTH_SHORT).show();
-            } else {
-                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                someActivityResultLauncher.launch(intent);
-            }
-        });
-
-        main_btn_turnOff.setOnClickListener(v -> {
-            if (!bluetoothAdapter.isEnabled()) {
-                Toast.makeText(this, "Already off", Toast.LENGTH_SHORT).show();
-            } else {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    if (ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 2);
-                            return;
-                        }
-                    }
-                }
-                bluetoothAdapter.disable();
-                main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_disabled);
-                Toast.makeText(this, "Bluetooth turned off", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -258,8 +233,10 @@ public class MainActivity extends AppCompatActivity {
     private void getBleData() {
             if(bluetoothAdapter.isEnabled()){
                 main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_enabled);
+                main_switch_onOffBluetooth.setChecked(true);
             }else {
                 main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_disabled);
+                main_switch_onOffBluetooth.setChecked(false);
         }
     }
 
@@ -333,10 +310,10 @@ public class MainActivity extends AppCompatActivity {
         main_btn_bluetoothScan = findViewById(R.id.main_btn_bluetoothScan);
         main_img_bluetoothStatus = findViewById(R.id.main_img_bluetoothStatus);
         main_LL_settingsLayout = findViewById(R.id.main_LL_settingsLayout);
+        main_switch_onOffBluetooth = findViewById(R.id.main_switch_onOffBluetooth);
+
         main_LL_onOffLayout = findViewById(R.id.main_LL_onOffLayout);
         main_imgbtn_settings = findViewById(R.id.main_imgbtn_settings);
-        main_btn_turnOn = findViewById(R.id.main_btn_turnOn);
-        main_btn_turnOff = findViewById(R.id.main_btn_turnOff);
         main_tv_scanning = findViewById(R.id.main_tv_scanning);
         main_tv_dots = findViewById(R.id.main_tv_dots);
 
