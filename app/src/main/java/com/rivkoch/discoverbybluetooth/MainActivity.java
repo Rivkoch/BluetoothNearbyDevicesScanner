@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
     };
     ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), permissionCallBack);
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
         findViews();
         setRecyclerView();
         setViewAdapter();
-
         setListeners();
     }
 
@@ -110,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
         bluetoothDevices = new ArrayList<>();
         device = new Device();
         listOfNames = new ArrayList<>();
-
     }
 
     private void setBluetoothAdapter() {
@@ -119,12 +116,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
-
         main_btn_turnOn.setOnClickListener(v -> {
             if (bluetoothAdapter.isEnabled()) {
                 Toast.makeText(this, "Already on", Toast.LENGTH_SHORT).show();
             } else {
-
                 Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 someActivityResultLauncher.launch(intent);
             }
@@ -134,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
             if (!bluetoothAdapter.isEnabled()) {
                 Toast.makeText(this, "Already off", Toast.LENGTH_SHORT).show();
             } else {
-
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                     if (ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -146,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
                 bluetoothAdapter.disable();
                 main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_disabled);
                 Toast.makeText(this, "Bluetooth turned off", Toast.LENGTH_SHORT).show();
-
             }
         });
 
@@ -159,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         main_btn_bluetoothScan.setOnClickListener(v -> {
-
             if (!bluetoothAdapter.isEnabled()) {
                 Toast.makeText(this, "Bluetooth off, turn it on for scanning.", Toast.LENGTH_LONG).show();
             }
@@ -167,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
             checkPermissions();
 
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-
                 if (ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_DENIED) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 2);
@@ -175,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
+
             if(!isRegistred) {
                 registerReceiver(bluetoothScanReceiver, intentFilter);
                 isRegistred = true;
@@ -190,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
                 main_tv_scanning.setVisibility(View.VISIBLE);
                 main_tv_scanning.setText("No devices were found.");
             }
-
         });
     }
 
@@ -203,17 +194,13 @@ public class MainActivity extends AppCompatActivity {
                         // There are no request codes
                         main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_enabled);
                         Toast.makeText(MainActivity.this, "Bluetooth turned on", Toast.LENGTH_LONG).show();
-
                     } else {
                         Toast.makeText(MainActivity.this, "The user decided to deny bluetooth access", Toast.LENGTH_LONG).show();
                     }
-
                 }
             });
 
-
     private void checkPermissions() {
-
         boolean resultNearby = false;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             resultNearby = ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED;
@@ -233,30 +220,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getBleData() {
-
             if(bluetoothAdapter.isEnabled()){
                 main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_enabled);
             }else {
                 main_img_bluetoothStatus.setImageResource(R.drawable.va_bluetooth_disabled);
-
-
         }
     }
 
     private void requestNearby() {
         isLocationPermission = false;
         requestPermissionLauncher.launch(android.Manifest.permission.BLUETOOTH_CONNECT);
-
     }
 
     private void requestPermissionWithRationaleCheck() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, android.Manifest.permission.BLUETOOTH_CONNECT)) {
             openPermissionSettingDialog();
-
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             openPermissionSettingDialog();
         }
-
     }
 
     private void requestLocation() {
@@ -265,8 +246,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openPermissionSettingDialog() {
-
-        String message = "Location and Nearby permissions are important for app functionality. You will be transported to Setting screen because the permissions are permanently disable. Please manually allow them.";
+        String message="";
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            message = "Location and Nearby permissions are important for app functionality. You will be transported to Setting screen because the permissions are permanently disable. Please manually allow them.";
+        }else {
+            message = "DiscoverByBluetooth permission are important for app functionality. You will be transported to Setting screen because access to the device's location is permanently disable. Please manually allow it.";
+        }
         alertDialog =
                 new AlertDialog.Builder(MainActivity.this)
                         .setMessage(message)
@@ -276,7 +261,6 @@ public class MainActivity extends AppCompatActivity {
                                     dialog.cancel();
                                 }).show();
         alertDialog.setCanceledOnTouchOutside(true);
-
     }
 
     private final ActivityResultLauncher<Intent> manuallyPermissionResultLauncher = registerForActivityResult(
@@ -293,16 +277,13 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == MANUALLY_LOCATION_PERMISSION_REQUEST_CODE) {
             boolean result = false;
             result = ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
-
             if (result && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 requestNearby();
-
             }
         }
     }
 
     private void openSettingsManually() {
-
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", getPackageName(), null);
@@ -336,7 +317,6 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(ACTION_STATE_CHANGED);
         intentFilter.addAction(ACTION_SCAN_MODE_CHANGED);
     }
-
 
     private final BroadcastReceiver bluetoothScanReceiver = new BroadcastReceiver() {
         @SuppressLint("MissingPermission")
@@ -373,17 +353,17 @@ public class MainActivity extends AppCompatActivity {
                 /* Bluetooth device found */
             } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 
-                //bluetooth device found
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                 String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
-
                 main_tv_dots.append(" . ");
 
                 if (name != null) {
 
                     if (listOfNames.size() == 0 || !listOfNames.contains(name)) {
+
                         device.setName(name);
                         device.setDistance(calculateDistance(rssi));
+
                         // Add device to list
                         bluetoothDevices.add(device);
                         listOfNames.add(name);
@@ -392,6 +372,7 @@ public class MainActivity extends AppCompatActivity {
                         deviceAdapter.addToList(device);
                     }
                     else{
+                        // The "scanning animation"
                         main_tv_dots.append(" . ");
                     }
                 }
@@ -416,9 +397,7 @@ public class MainActivity extends AppCompatActivity {
                     registerReceiver(bluetoothScanReceiver, intentFilter);
                     isRegistred = true;
                 }
-
             }
-
         } catch (Exception e) {
             // already registered
         }
